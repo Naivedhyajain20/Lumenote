@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: lumenote-backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true

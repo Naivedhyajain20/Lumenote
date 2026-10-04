@@ -43,6 +43,7 @@ out/
 # Data & Temp Storage
 ai4i.zip
 data/chroma/
+data/uploads/
 *.log
 .DS_Store
 Thumbs.db

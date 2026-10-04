@@ -1,0 +1,7 @@
+# Ignore Python backend and data from Vercel build
+backend/
+data/
+demo_data/
+docs/
+.venv/
+ai4i.zip

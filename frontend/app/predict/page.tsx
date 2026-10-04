@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  Activity, AlertTriangle, CheckCircle2, ChevronRight,
-  Cpu, Download, Gauge, HelpCircle, Layers, RefreshCw,
-  Settings, ShieldAlert, Sliders, Sparkles, TrendingUp,
-  UploadCloud, Zap, ArrowUpRight, BarChart2, Flame,
-  Clock, FileSpreadsheet, ExternalLink
+  AlertTriangle, CheckCircle2, ChevronRight, RefreshCw,
+  ShieldAlert, Sliders, Sparkles, UploadCloud, Zap,
+  Clock, ExternalLink
 } from "lucide-react";
 
 interface ModelMetrics {
@@ -76,6 +74,7 @@ export default function PredictPage() {
   const [toolWear, setToolWear] = useState<number>(45);
 
   // States
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
@@ -84,17 +83,9 @@ export default function PredictPage() {
   const [activeTab, setActiveTab] = useState<"simulator" | "unseen" | "metrics">("simulator");
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
-  // Fetch metrics & unseen cases on mount
-  useEffect(() => {
-    fetchMetrics();
-    fetchUnseenCases();
-    // Run initial prediction
-    runPrediction(machineType, airTemp, processTemp, rpm, torque, toolWear);
-  }, []);
-
   const fetchMetrics = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/predict/metrics");
+      const res = await fetch(`${API_BASE}/api/predict/metrics`);
       if (res.ok) {
         const data = await res.json();
         setMetrics(data.metrics);
@@ -107,7 +98,7 @@ export default function PredictPage() {
 
   const fetchUnseenCases = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/predict/unseen-cases");
+      const res = await fetch(`${API_BASE}/api/predict/unseen-cases`);
       if (res.ok) {
         const data = await res.json();
         setUnseenCases(data.cases || []);
@@ -127,7 +118,7 @@ export default function PredictPage() {
   ) => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/predict/telemetry", {
+      const res = await fetch(`${API_BASE}/api/predict/telemetry`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -149,6 +140,17 @@ export default function PredictPage() {
       setLoading(false);
     }
   };
+
+  // Load the initial dashboard snapshot once; controls trigger fresh predictions explicitly.
+  useEffect(() => {
+    const initialValues = { machineType, airTemp, processTemp, rpm, torque, toolWear };
+    void Promise.resolve().then(() => {
+      void fetchMetrics();
+      void fetchUnseenCases();
+      void runPrediction(initialValues.machineType, initialValues.airTemp, initialValues.processTemp, initialValues.rpm, initialValues.torque, initialValues.toolWear);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Preset Handlers
   const applyPreset = (presetName: string) => {
@@ -217,7 +219,7 @@ export default function PredictPage() {
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await fetch("http://localhost:8000/api/predict/upload-csv", {
+      const res = await fetch(`${API_BASE}/api/predict/upload-csv`, {
         method: "POST",
         body: formData
       });
@@ -233,7 +235,7 @@ export default function PredictPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-page)] pb-16">
+    <div className="app-route-enter min-h-screen bg-[var(--color-page)] pb-16">
       {/* ── HERO BANNER ── */}
       <section className="bg-navy-hero px-4 md:px-8 pt-8 pb-10 text-white relative overflow-hidden">
         {/* Soft specular ambient glow */}

@@ -1,370 +1,198 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import Navbar from "@/components/Navbar";
 import {
-  CheckCircle2, AlertCircle, ShieldCheck, ArrowRight,
-  Database, FileCheck, HelpCircle, ChevronDown,
-  ChevronUp, Scale, Check
+  ArrowDown, ArrowRight, ArrowUpRight, Activity, BookOpen, Check,
+  ChevronDown, ChevronUp, FileSearch, GitCompareArrows, ScanEye,
+  ShieldQuestion, Waypoints,
 } from "lucide-react";
+import Reveal from "@/components/Reveal";
+
+const capabilities = [
+  {
+    number: "01",
+    Icon: FileSearch,
+    title: "Follow the source",
+    text: "Move from an answer to the document passage behind it. Keep the source close while you investigate.",
+  },
+  {
+    number: "02",
+    Icon: GitCompareArrows,
+    title: "Compare the details",
+    text: "Bring different dates, amounts, or statements into view together and review the original records.",
+  },
+  {
+    number: "03",
+    Icon: ShieldQuestion,
+    title: "See what is uncertain",
+    text: "When the available evidence is weak or incomplete, that uncertainty stays visible in the workspace.",
+  },
+];
+
+const questions = [
+  { question: "What files can I add?", answer: "The workspace accepts PDF, DOCX, TXT, Markdown, JPG, PNG, and TIFF files. Scanned images can be processed through OCR." },
+  { question: "How do citations work?", answer: "Answers can include citations to retrieved passages. Select a citation to open the corresponding document page and inspect the source text." },
+  { question: "What happens when records disagree?", answer: "Detected conflicts are shown alongside their source records so you can compare the values and review the original evidence." },
+  { question: "Can I work with machine telemetry too?", answer: "Yes. Predict Next is a separate workspace for machine telemetry, validation cases, and predictive maintenance metrics." },
+];
+
+function EvidenceOrbit() {
+  return (
+    <div className="orbit-scene" aria-label="Illustration of connected evidence sources">
+      <svg className="orbit-art" viewBox="0 0 1000 500" fill="none" aria-hidden="true">
+        <defs>
+          <radialGradient id="orbit-glow"><stop stopColor="#8E83F2" stopOpacity=".2" /><stop offset="1" stopColor="#8E83F2" stopOpacity="0" /></radialGradient>
+          <linearGradient id="orbit-stroke" x1="170" y1="120" x2="840" y2="380"><stop stopColor="#9C92F4" stopOpacity=".08" /><stop offset=".5" stopColor="#897CEC" stopOpacity=".42" /><stop offset="1" stopColor="#6E64D6" stopOpacity=".1" /></linearGradient>
+        </defs>
+        <ellipse cx="500" cy="250" rx="306" ry="215" fill="url(#orbit-glow)" />
+        <circle cx="500" cy="244" r="178" stroke="url(#orbit-stroke)" />
+        <circle cx="500" cy="244" r="221" stroke="#9B91EB" strokeOpacity=".18" strokeDasharray="2 8" />
+        <ellipse cx="500" cy="244" rx="430" ry="68" transform="rotate(-8 500 244)" stroke="#8980E7" strokeOpacity=".28" />
+        <ellipse cx="500" cy="244" rx="345" ry="118" transform="rotate(24 500 244)" stroke="#8980E7" strokeOpacity=".18" />
+        <ellipse cx="500" cy="244" rx="345" ry="118" transform="rotate(-24 500 244)" stroke="#8980E7" strokeOpacity=".15" />
+        <path d="M375 132 485 104 588 148 643 236 574 340 479 384 377 329 344 229 375 132Z" stroke="#756BDD" strokeOpacity=".3" />
+        <path d="m375 132 104 252m6-280-6 280m109-236L377 329m266-93L375 132m199 208L485 104m-141 125 268 7" stroke="#756BDD" strokeOpacity=".18" />
+        <path d="m375 132 213 16M344 229l230 111m69-104L377 329m-33-100 277 7" stroke="#B0A9FB" strokeOpacity=".32" strokeDasharray="3 7" />
+        {[[375,132],[485,104],[588,148],[643,236],[574,340],[479,384],[377,329],[344,229],[500,244],[438,190],[548,290]].map(([cx,cy],i)=>(
+          <g key={`${cx}-${cy}`}><circle cx={cx} cy={cy} r={i===8?7:4} fill={i===8?"#8177E7":"#B6B0F5"} fillOpacity={i===8?".9":".7"} /><circle cx={cx} cy={cy} r={i===8?16:10} stroke="#9187EF" strokeOpacity={i===8?".27":".13"} /></g>
+        ))}
+      </svg>
+      <div className="orbit-card orbit-card-source"><span className="orbit-card-label"><i /> SOURCE LINKED</span><strong>Evidence excerpt</strong><span className="orbit-card-rule" /></div>
+      <div className="orbit-card orbit-card-citation"><span className="orbit-card-label"><i /> CITATION</span><strong>Page &amp; passage</strong></div>
+      <div className="orbit-card orbit-card-review"><span className="orbit-card-label"><i /> REVIEW</span><strong>Compare records</strong></div>
+      <div className="orbit-center-mark"><Waypoints size={21} strokeWidth={1.5} /></div>
+    </div>
+  );
+}
+
+function LandingHeader() {
+  return (
+    <header className="landing-header page-width">
+      <Link href="/" className="landing-brand" aria-label="Lumenote home">
+        <span className="landing-brand-mark"><Waypoints size={19} strokeWidth={1.8} /></span>
+        <span>Lumenote<small>Evidence intelligence</small></span>
+      </Link>
+      <nav className="landing-nav" aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <Link href="/workspace">Investigation</Link>
+        <Link href="/predict">Predict Next</Link>
+      </nav>
+      <Link href="/workspace" className="landing-header-cta">Open workspace <ArrowUpRight size={14} /></Link>
+    </header>
+  );
+}
 
 export default function LandingPage() {
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  const PIPELINE_STEPS = [
-    {
-      title: "1. Upload & Ingest",
-      tagline: "Multi-format ingestion with structural normalization",
-      desc: "Upload contracts, invoices, emails, receipts, and meeting notes in PDF, DOCX, and image formats. Files are normalized and indexed with structural metadata.",
-      checklist: [
-        "PDF text extraction & layout geometry preserved",
-        "Multilingual Tesseract OCR for scans & photos",
-        "Document authority weighting & trust score calculation",
-        "Duplicate page filtering & hash integrity logging",
-      ],
-    },
-    {
-      title: "2. Extract & Embed",
-      tagline: "Hybrid BM25 and semantic vector indexing",
-      desc: "Every paragraph, table row, and clause is segmented into discrete evidence chunks with bounding box coordinates for exact retrieval.",
-      checklist: [
-        "Dense vector embeddings combined with sparse BM25 indexing",
-        "Entity identification: People, Organizations, Dates, Currencies",
-        "Fact tuple extraction: (Subject, Predicate, Value, Date)",
-        "Chronological timestamp normalization",
-      ],
-    },
-    {
-      title: "3. Verify & Cross-Check",
-      tagline: "Autonomous cross-document conflict detection",
-      desc: "The system compares extracted facts across different records to identify discrepancies in delivery dates, advance payments, and legal obligations.",
-      checklist: [
-        "Pairwise claim comparison across all uploaded documents",
-        "Discrepancy categorization: Delivery dates, Amounts, Terms",
-        "Severity assessment (High / Medium / Low)",
-        "Identification of most legally reliable source",
-      ],
-    },
-    {
-      title: "4. Investigate & Ground",
-      tagline: "Interactive natural language inquiry with citations",
-      desc: "Ask inquiries in natural language. Answers are returned with clickable citations [Contract, p.3] and an explicit confidence breakdown.",
-      checklist: [
-        "Answers include citations to retrieved evidence",
-        "Abstention signals when evidence is weak or missing",
-        "Four-signal confidence breakdown (Retrieval, Entailment, Agreement, Trust)",
-        "Instant passage highlight in the side-by-side source viewer",
-      ],
-    },
-    {
-      title: "5. Synthesize & Report",
-      tagline: "A reviewable investigation report",
-      desc: "Generate a report that brings together findings, detected conflicts, and citation references for investigator review.",
-      checklist: [
-        "Executive summary of agreed facts and unresolved disputes",
-        "Side-by-side evidence tables with exact document quotes",
-        "Document reliability scores & OCR quality breakdown",
-        "Exportable as clean Markdown or publication-ready PDF",
-      ],
-    },
-  ];
-
-  const FAQS = [
-    {
-      q: "What types of documents can be investigated?",
-      a: "The uploader accepts PDFs, DOCX, plain text or Markdown files, and JPG, PNG, or TIFF images up to the configured file-size limit.",
-    },
-    {
-      q: "How are answers grounded in the records?",
-      a: "Answers can include citations to retrieved passages, and the workspace lets you inspect the cited source. If evidence is weak or missing, the system can flag an abstention. Review generated answers against the original documents.",
-    },
-    {
-      q: "How are document contradictions identified?",
-      a: "Extracted entities and predicates are mapped into a matrix. When different documents report incompatible values for the same event (e.g. 15 Feb vs 20 Feb), a Conflict Panel is surfaced above the answer.",
-    },
-    {
-      q: "What constitutes the confidence score?",
-      a: "Confidence is computed from four independent signals: Retrieval Strength (40%), Claim Entailment (25%), Source Agreement (20%), and Document Trust Weight (15%).",
-    },
-    {
-      q: "How does the source viewer highlight cited passages?",
-      a: "Clicking any citation chip [Contract, p.3] jumps the document viewer to that exact page and covers the cited sentence with a distinct yellow highlight strip (#FFE27A).",
-    },
-  ];
+  const [openQuestion, setOpenQuestion] = useState<number | null>(0);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-page)] text-[var(--color-ink)] font-sans">
-      <Navbar />
-
-      {/* ── 1. FLAT DEEP-NAVY HERO (Prompt Specification: Flat Navy #0B1F4B, No Gradients/Blobs) ── */}
-      <section className="bg-navy-hero py-16 md:py-24 px-6 border-b border-[var(--color-line)]">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold uppercase tracking-wider">
-            <ShieldCheck className="w-3.5 h-3.5 text-[var(--color-verified)]" />
-            <span>Forensic Document Investigation Platform</span>
-          </div>
-
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-            Investigate multiple documents with source citations and visible contradictions
-          </h1>
-
-          <p className="text-sm md:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Upload case records, ask questions in natural language, and review cited passages, detected conflicts, and uncertainty signals alongside the source files.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Link
-              href="/login"
-              className="btn-pill btn-pill-primary py-2.5 px-6 text-sm font-semibold shadow-xs"
-            >
-              <span>Open sample case</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Link>
-            <Link
-              href="/workspace"
-              className="btn-pill btn-pill-secondary py-2.5 px-6 text-sm font-semibold bg-white/10 text-white border-white/20 hover:bg-white/20"
-            >
-              <span>Explore Workspace</span>
-            </Link>
-            <Link
-              href="/predict"
-              className="btn-pill py-2.5 px-6 text-sm font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-md border border-white/20"
-            >
-              <span>Predict What Happens Next (ALG-DATA-02) →</span>
-            </Link>
-          </div>
-
-          {/* Value Pillars */}
-          <div className="pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left max-w-3xl mx-auto">
-            <div className="space-y-1">
-              <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-verified)]" />
-                Exact Citations
-              </div>
-              <p className="text-xs text-slate-300 leading-snug">
-                Follow answer citations back to the source document and page.
-              </p>
+    <div className="landing-page">
+      <div className="landing-hero">
+        <LandingHeader />
+        <div className="hero-wrap page-width">
+          <EvidenceOrbit />
+          <div className="hero-copy">
+            <p className="landing-kicker"><span />DOCUMENT INTELLIGENCE <b>·</b> PREDICTIVE MAINTENANCE</p>
+            <h1>Evidence<br /><em>in context.</em></h1>
+            <p className="landing-lede">Bring scattered records into one place. Follow citations, compare details, and make the next decision with the source still in view.</p>
+            <div className="landing-actions">
+              <Link href="/workspace" className="landing-primary">Open investigation <span><ArrowRight size={16} /></span></Link>
+              <Link href="/predict" className="landing-text-link">Explore Predict Next <ArrowUpRight size={15} /></Link>
             </div>
-
-            <div className="space-y-1">
-              <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-[var(--color-conflict)]" />
-                Conflict Detection
-              </div>
-              <p className="text-xs text-slate-300 leading-snug">
-                Side-by-side matrices identify diverging delivery dates and payment sums.
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Scale className="w-3.5 h-3.5 text-[var(--color-uncertain)]" />
-                Honest Abstention
-              </div>
-              <p className="text-xs text-slate-300 leading-snug">
-                Explicitly states when records lack evidence instead of generating assumptions.
-              </p>
-            </div>
+            <div className="landing-trust"><span><Check size={14} /> Source-linked answers</span><span><Check size={14} /> Conflicts in context</span></div>
           </div>
+          <a href="#platform" className="landing-scroll"><span>Scroll to explore</span><ArrowDown size={15} /></a>
+          <span className="hero-coordinate" aria-hidden="true">LUMENOTE / 01</span>
         </div>
-      </section>
+      </div>
 
-      {/* ── 2. ROSSUM PROCESS JOURNEY PIPELINE (Reference B) ── */}
-      <section className="py-16 md:py-20 px-6 max-w-5xl mx-auto w-full space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-[var(--color-navy)] tracking-tight">
-            The Document Investigation Pipeline
-          </h2>
-          <p className="text-xs md:text-sm text-[var(--color-muted)] max-w-xl mx-auto">
-            A structured workflow from document ingestion to investigator-ready reports.
-          </p>
-        </div>
-
-        {/* Horizontal Tab Strip (Rossum: Raised white surface + underline) */}
-        <div className="flex border-b border-[var(--color-line)] bg-[var(--color-panel)] rounded-t-xl overflow-x-auto no-scrollbar">
-          {PIPELINE_STEPS.map((step, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveStep(idx)}
-              className={`flex-1 py-3 px-4 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer text-center ${
-                activeStep === idx
-                  ? "bg-[var(--color-surface)] border-[var(--color-primary)] text-[var(--color-primary)] shadow-xs"
-                  : "border-transparent text-[var(--color-muted)] hover:text-[var(--color-ink)]"
-              }`}
-            >
-              {step.title}
-            </button>
-          ))}
-        </div>
-
-        {/* Active Stage Details & Green Checklist (Rossum Pattern) */}
-        <div className="card-base p-6 md:p-8 space-y-6">
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-mono font-bold text-[var(--color-primary)] uppercase">
-              Pipeline Stage {activeStep + 1}
-            </span>
-            <h3 className="text-lg font-bold text-[var(--color-navy)]">
-              {PIPELINE_STEPS[activeStep].tagline}
-            </h3>
-            <p className="text-xs md:text-sm text-[var(--color-muted)] leading-relaxed max-w-3xl">
-              {PIPELINE_STEPS[activeStep].desc}
-            </p>
+      <main>
+        <section id="platform" className="landing-section page-width">
+          <Reveal className="section-heading">
+            <p className="landing-kicker"><span />A CLEARER WAY TO INVESTIGATE</p>
+            <h2>Stay close to<br /><em>what the record says.</em></h2>
+            <p>Documents rarely tell one perfectly consistent story. Lumenote helps you inspect sources, compare accounts, and keep open questions in view.</p>
+          </Reveal>
+          <div className="capability-grid">
+            {capabilities.map(({ number, Icon, title, text }, index) => (
+              <Reveal key={number} delay={index * 90}>
+                <article className="capability-card">
+                  <div className="capability-head"><span>{number} / 03</span><Icon size={19} strokeWidth={1.6} /></div>
+                  <h3>{title}</h3><p>{text}</p>
+                  <span className="capability-corner" aria-hidden="true">↗</span>
+                </article>
+              </Reveal>
+            ))}
           </div>
+        </section>
 
-          <div className="border-t border-[var(--color-line)] pt-4">
-            <h4 className="text-xs font-bold text-[var(--color-navy)] uppercase tracking-wider mb-3">
-              Automated Forensic Operations:
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {PIPELINE_STEPS[activeStep].checklist.map((item, i) => (
-                <div key={i} className="flex items-start gap-2.5 text-xs text-[var(--color-ink)]">
-                  <div className="w-4 h-4 rounded-full bg-[var(--color-verified-soft)] text-[var(--color-verified)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-2.5 h-2.5" />
-                  </div>
-                  <span>{item}</span>
-                </div>
+        <section className="workflow-section">
+          <div className="page-width workflow-layout">
+            <Reveal className="workflow-intro">
+              <p className="landing-kicker"><span />ONE CONNECTED WORKFLOW</p>
+              <h2>From source<br />to <em>next step.</em></h2>
+              <p>Every stage keeps the underlying evidence within reach, so you can make a careful review without losing context.</p>
+              <Link href="/workspace" className="landing-text-link">See the investigation workspace <ArrowRight size={15} /></Link>
+            </Reveal>
+            <div className="workflow-list">
+              {[
+                ["01", "Gather", "Add the documents and records that matter."],
+                ["02", "Connect", "Search across the corpus and follow references."],
+                ["03", "Compare", "Review disagreements against the original sources."],
+                ["04", "Synthesize", "Prepare a report for careful human review."],
+              ].map(([number, title, text], index) => (
+                <Reveal key={number} delay={index * 65}>
+                  <div className="workflow-row"><span>{number}</span><div><h3>{title}</h3><p>{text}</p></div><ArrowUpRight size={15} /></div>
+                </Reveal>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 3. THREE CORE FORENSIC CAPABILITIES ── */}
-      <section className="py-16 px-6 bg-[var(--color-surface)] border-y border-[var(--color-line)]">
-        <div className="max-w-5xl mx-auto space-y-12">
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-[var(--color-navy)] tracking-tight">
-              Built for High-Stakes Evidence Verification
-            </h2>
-            <p className="text-xs md:text-sm text-[var(--color-muted)] max-w-xl mx-auto">
-              Eliminate ambiguity with verifiable citations, cross-document contradiction exposure, and confidence breakdowns.
-            </p>
+        <section className="modules-section page-width">
+          <Reveal className="modules-heading">
+            <div><p className="landing-kicker"><span />TWO FOCUSED WORKSPACES</p><h2>One considered<br /><em>way to see more.</em></h2></div>
+            <p>Document investigation and predictive maintenance, each designed around the evidence it uses.</p>
+          </Reveal>
+          <div className="module-grid">
+            <Reveal><Link href="/workspace" className="module-card module-docs">
+              <div className="module-topline"><span>01 / ALG-AI-02</span><ArrowUpRight size={17} /></div>
+              <div className="module-icon"><BookOpen size={19} /></div>
+              <h3>Document<br />Investigation</h3>
+              <p>Ask across multiple records. Follow citations, compare conflicting statements, and prepare a reviewable report.</p>
+              <span className="module-link">Open investigation <ArrowRight size={15} /></span>
+            </Link></Reveal>
+            <Reveal delay={100}><Link href="/predict" className="module-card module-predict">
+              <div className="module-topline"><span>02 / ALG-DATA-02</span><ArrowUpRight size={17} /></div>
+              <div className="module-icon"><Activity size={19} /></div>
+              <h3>Predict what<br />happens next</h3>
+              <p>Explore machine telemetry, examine failure-risk signals, and review validation metrics.</p>
+              <span className="module-link">Explore Predict Next <ArrowRight size={15} /></span>
+            </Link></Reveal>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card 1 */}
-            <div className="card-soft p-5 space-y-3">
-              <div className="w-8 h-8 rounded-lg bg-[var(--color-surface)] text-[var(--color-primary)] flex items-center justify-center border border-[var(--color-line)] font-bold text-sm">
-                [C]
-              </div>
-              <h3 className="text-sm font-bold text-[var(--color-navy)]">
-                Pinpoint Citation Grounding
-              </h3>
-              <p className="text-xs text-[var(--color-muted)] leading-relaxed">
-                Answers include citations to retrieved evidence passages. Select a citation to inspect its source document and page.
-              </p>
-            </div>
-
-            {/* Card 2 */}
-            <div className="card-soft p-5 space-y-3">
-              <div className="w-8 h-8 rounded-lg bg-[var(--color-surface)] text-[var(--color-conflict)] flex items-center justify-center border border-[var(--color-line)] font-bold text-sm">
-                ≠
-              </div>
-              <h3 className="text-sm font-bold text-[var(--color-navy)]">
-                Contradiction Detection
-              </h3>
-              <p className="text-xs text-[var(--color-muted)] leading-relaxed">
-                When contractual terms mismatch delivery notes or invoices, the platform extracts both statements side-by-side and highlights the legally superior source.
-              </p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="card-soft p-5 space-y-3">
-              <div className="w-8 h-8 rounded-lg bg-[var(--color-surface)] text-[var(--color-uncertain)] flex items-center justify-center border border-[var(--color-line)] font-bold text-sm">
-                ?
-              </div>
-              <h3 className="text-sm font-bold text-[var(--color-navy)]">
-                Honest Abstention
-              </h3>
-              <p className="text-xs text-[var(--color-muted)] leading-relaxed">
-                If documents omit critical details (e.g. warranty coverage duration), the system clearly declares what is missing rather than inventing false assurances.
-              </p>
-            </div>
+        <section className="faq-section">
+          <div className="page-width faq-layout">
+            <Reveal className="faq-heading"><p className="landing-kicker"><span />GOOD TO KNOW</p><h2>Questions<br /><em>before you begin?</em></h2><p>What to expect from the evidence workspace.</p><ScanEye className="faq-watermark" strokeWidth={0.8} /></Reveal>
+            <div className="faq-list">{questions.map((item, index) => (
+              <Reveal key={item.question} delay={index * 45}><article className={`faq-item ${openQuestion === index ? "faq-open" : ""}`}>
+                <button type="button" aria-expanded={openQuestion === index} onClick={() => setOpenQuestion(openQuestion === index ? null : index)}>
+                  <span><small>0{index + 1}</small>{item.question}</span>{openQuestion === index ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+                {openQuestion === index && <p>{item.answer}</p>}
+              </article></Reveal>
+            ))}</div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* ── 4. FAQ ACCORDION (Reference B Help Drawer Pattern) ── */}
-      <section className="py-16 md:py-20 px-6 max-w-4xl mx-auto w-full space-y-6">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-[var(--color-navy)] tracking-tight">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-xs md:text-sm text-[var(--color-muted)]">
-            Technical and methodological details regarding the platform.
-          </p>
-        </div>
-
-        <div className="space-y-2.5">
-          {FAQS.map((faq, i) => (
-            <div key={i} className="card-base overflow-hidden">
-              <button
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full p-4 text-left flex items-center justify-between text-xs md:text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-card-soft)] transition-colors cursor-pointer"
-              >
-                <span>{faq.q}</span>
-                {openFaq === i ? (
-                  <ChevronUp className="w-4 h-4 text-[var(--color-primary)] flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-[var(--color-muted)] flex-shrink-0" />
-                )}
-              </button>
-              {openFaq === i && (
-                <div className="p-4 pt-1 text-xs text-[var(--color-muted)] leading-relaxed border-t border-[var(--color-line)] bg-[var(--color-panel)]">
-                  {faq.a}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 5. ACCESS CASE PORTAL CTA ── */}
-      <section className="py-12 px-6 border-t border-[var(--color-line)] bg-[var(--color-card-soft)]">
-        <div className="max-w-3xl mx-auto text-center space-y-4">
-          <h3 className="text-xl font-bold text-[var(--color-navy)]">
-            Ready to investigate the sample case?
-          </h3>
-          <p className="text-xs text-[var(--color-muted)] max-w-md mx-auto">
-            Access the investigator sign-in page to launch your session or test the pre-loaded Orion vs. Northwind dispute.
-          </p>
-          <div className="pt-2">
-            <Link
-              href="/login"
-              className="btn-pill btn-pill-primary px-6 py-2.5 text-xs font-semibold"
-            >
-              <span>Go to Sign In & Case Portal</span>
-              <ArrowRight className="w-3.5 h-3.5 ml-1" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 6. FOOTER ROW OF ICON LINKS (Reference A: Documentation, Help, Feedback) ── */}
-      <footer className="border-t border-[var(--color-line)] bg-[var(--color-surface)] py-8 px-6 text-xs text-[var(--color-muted)]">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Lumenote Logo" width={20} height={20} className="w-5 h-5 object-contain" />
-            <span className="font-semibold text-[var(--color-navy)]">Lumenote</span>
-            <span>&copy; 2026. All rights reserved.</span>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <Link href="/" className="hover:text-[var(--color-ink)] flex items-center gap-1">
-              <FileCheck className="w-3.5 h-3.5" /> Documentation
-            </Link>
-            <Link href="/" className="hover:text-[var(--color-ink)] flex items-center gap-1">
-              <HelpCircle className="w-3.5 h-3.5" /> Help
-            </Link>
-            <Link href="/workspace" className="hover:text-[var(--color-ink)] flex items-center gap-1">
-              <Database className="w-3.5 h-3.5" /> Workspace
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <footer className="landing-footer"><div className="page-width footer-inner">
+        <Link href="/" className="landing-brand"><span className="landing-brand-mark"><Waypoints size={18} /></span><span>Lumenote<small>Evidence in context</small></span></Link>
+        <span className="footer-note">Make the record easier to read.</span>
+        <div className="footer-links"><Link href="/workspace">Investigation</Link><Link href="/predict">Predict Next</Link><Link href="/report">Reports</Link></div>
+      </div></footer>
     </div>
   );
 }

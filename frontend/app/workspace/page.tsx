@@ -195,7 +195,7 @@ export default function WorkspacePage() {
   }, [loadDocuments, handleSendMessage]);
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--color-page)] text-[var(--color-ink)] overflow-hidden font-sans">
+    <div className="app-route-enter h-screen flex flex-col bg-[var(--color-page)] text-[var(--color-ink)] overflow-hidden font-sans">
       <Navbar />
 
       {/* ── Sequential 3-Step Guided Header ── */}
