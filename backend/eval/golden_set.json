@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "question": "What is the total contract value?",
+    "expected_answer_facts": ["5,00,000", "18% GST", "5,90,000"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 2,
+    "question": "When was the furniture delivered?",
+    "expected_answer_facts": ["15 Feb 2026", "20 Feb 2026", "28 Feb 2026"],
+    "expected_docs": ["1_Supply_Contract.pdf", "3_Email_Vendor.docx", "4_Email_Client.docx"],
+    "expect_conflict": true,
+    "expect_abstain": false
+  },
+  {
+    "id": 3,
+    "question": "How much advance was paid?",
+    "expected_answer_facts": ["2,50,000", "2,00,000"],
+    "expected_docs": ["1_Supply_Contract.pdf", "2_Invoice.jpg", "6_Payment_Receipt.png"],
+    "expect_conflict": true,
+    "expect_abstain": false
+  },
+  {
+    "id": 4,
+    "question": "What is the warranty period?",
+    "expected_answer_facts": ["INSUFFICIENT_EVIDENCE", "warranty"],
+    "expected_docs": [],
+    "expect_conflict": false,
+    "expect_abstain": true
+  },
+  {
+    "id": 5,
+    "question": "How many days was delivery late and what penalty applies?",
+    "expected_answer_facts": ["1% per week", "15 Feb 2026", "late"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": true,
+    "expect_abstain": false
+  },
+  {
+    "id": 6,
+    "question": "When will the remaining payment be made?",
+    "expected_answer_facts": ["soon", "no date"],
+    "expected_docs": ["5_Meeting_Notes.txt"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 7,
+    "question": "Who is the buyer in the supply agreement?",
+    "expected_answer_facts": ["Orion Interiors"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 8,
+    "question": "Who is the seller in the agreement?",
+    "expected_answer_facts": ["Northwind Supplies"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 9,
+    "question": "On what date was the supply agreement executed?",
+    "expected_answer_facts": ["10 Jan 2026"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 10,
+    "question": "What is the invoice number issued by Northwind Supplies?",
+    "expected_answer_facts": ["INV-2026-088"],
+    "expected_docs": ["2_Invoice.jpg"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 11,
+    "question": "What total amount is listed on the invoice including tax?",
+    "expected_answer_facts": ["5,90,000"],
+    "expected_docs": ["2_Invoice.jpg"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 12,
+    "question": "When were the goods dispatched from Northwind's warehouse?",
+    "expected_answer_facts": ["12 Feb 2026"],
+    "expected_docs": ["3_Email_Vendor.docx"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 13,
+    "question": "What defects or damage did the buyer find upon inspection?",
+    "expected_answer_facts": ["scratches", "damaged", "conference desks", "chairs"],
+    "expected_docs": ["4_Email_Client.docx"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 14,
+    "question": "What bank was used for the advance payment transfer?",
+    "expected_answer_facts": ["HDFC"],
+    "expected_docs": ["6_Payment_Receipt.png"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 15,
+    "question": "What is the transaction reference of the payment receipt?",
+    "expected_answer_facts": ["N1102604819230"],
+    "expected_docs": ["6_Payment_Receipt.png"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 16,
+    "question": "Who signed the contract on behalf of Orion Interiors?",
+    "expected_answer_facts": ["Rajesh Mehta"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 17,
+    "question": "Who signed the contract on behalf of Northwind Supplies?",
+    "expected_answer_facts": ["Vikram Sharma"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 18,
+    "question": "What is the agreed jurisdiction for dispute resolution?",
+    "expected_answer_facts": ["Mumbai"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 19,
+    "question": "What was the date of the commercial review meeting?",
+    "expected_answer_facts": ["05 Mar 2026"],
+    "expected_docs": ["5_Meeting_Notes.txt"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 20,
+    "question": "What is the insurance policy number for maritime transit?",
+    "expected_answer_facts": ["INSUFFICIENT_EVIDENCE"],
+    "expected_docs": [],
+    "expect_conflict": false,
+    "expect_abstain": true
+  },
+  {
+    "id": 21,
+    "question": "Does the contract specify an arbitration clause in Singapore?",
+    "expected_answer_facts": ["INSUFFICIENT_EVIDENCE", "Mumbai", "India"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": true
+  },
+  {
+    "id": 22,
+    "question": "What is the exact penalty percentage per week for delayed delivery?",
+    "expected_answer_facts": ["1%"],
+    "expected_docs": ["1_Supply_Contract.pdf"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 23,
+    "question": "What balance due does the vendor claim on the invoice?",
+    "expected_answer_facts": ["3,90,000"],
+    "expected_docs": ["2_Invoice.jpg"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 24,
+    "question": "What reason did the vendor give for transit delays during the meeting?",
+    "expected_answer_facts": ["interstate border check", "border"],
+    "expected_docs": ["5_Meeting_Notes.txt"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  },
+  {
+    "id": 25,
+    "question": "Who attended the review meeting as facilitator?",
+    "expected_answer_facts": ["S. Kothari", "Kothari"],
+    "expected_docs": ["5_Meeting_Notes.txt"],
+    "expect_conflict": false,
+    "expect_abstain": false
+  }
+]
