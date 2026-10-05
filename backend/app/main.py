@@ -47,6 +47,15 @@ app.include_router(report_router)
 app.include_router(eval_router)
 app.include_router(predict_router)
 
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "service": "Lumenote API",
+        "documentation": "/docs",
+        "health": "/health"
+    }
+
 @app.get("/health")
 def health_check():
     return {
