@@ -1,6 +1,7 @@
 import re
 import logging
 from typing import List, Dict, Any, Tuple
+from app.config import settings
 
 logger = logging.getLogger("investigator.rerank")
 
@@ -13,6 +14,9 @@ class DocumentReranker:
         if self._model_initialized:
             return
         self._model_initialized = True
+        if getattr(settings, "LOW_MEMORY_MODE", False):
+            logger.info("Low memory mode active (Render/container). Using lexical-semantic scoring fallback.")
+            return
         try:
             import torch
             torch.set_num_threads(1)

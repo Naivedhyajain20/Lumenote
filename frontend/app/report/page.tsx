@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Download, FileText, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { API_BASE } from "@/lib/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ReportPage() {
   const [markdownContent, setMarkdownContent] = useState<string>("");

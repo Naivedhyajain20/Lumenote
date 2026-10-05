@@ -2,6 +2,7 @@
 .env
 .env.local
 .env.*.local
+!frontend/.env.production
 
 # Python
 __pycache__/
@@ -20,7 +21,9 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+backend/lib/
+!frontend/lib/
+
 lib64/
 parts/
 sdist/

@@ -28,6 +28,9 @@ class HybridRetriever:
         if self._model_initialized:
             return
         self._model_initialized = True
+        if getattr(settings, "LOW_MEMORY_MODE", False):
+            logger.info("Low memory mode active (Render/container). Using lightweight deterministic embeddings.")
+            return
         try:
             import torch
             torch.set_num_threads(1)

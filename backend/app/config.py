@@ -6,7 +6,9 @@ from pydantic_settings import BaseSettings
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+APP_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = APP_DIR if (APP_DIR / "app").exists() else APP_DIR.parent
+demo_candidate = APP_DIR / "demo_data" if (APP_DIR / "demo_data").exists() else BASE_DIR / "demo_data"
 
 class Settings(BaseSettings):
     LLM_PROVIDER: str = "gemini"  # gemini | openai | anthropic | ollama | mock
@@ -25,10 +27,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str = f"sqlite:///{BASE_DIR}/data/app.db"
     CHROMA_PERSIST_DIR: str = str(BASE_DIR / "data" / "chroma")
     UPLOAD_DIR: str = str(BASE_DIR / "data" / "uploads")
-    DEMO_DATA_DIR: str = str(BASE_DIR / "demo_data")
+    DEMO_DATA_DIR: str = str(demo_candidate)
+    LOW_MEMORY_MODE: bool = os.environ.get("RENDER") is not None or os.environ.get("LOW_MEMORY_MODE", "1").lower() in ("1", "true", "yes")
 
     class Config:
-        env_file = [str(BASE_DIR / ".env"), str(BASE_DIR / "backend" / ".env")]
+        env_file = [str(BASE_DIR / ".env"), str(APP_DIR / ".env")]
         env_file_encoding = "utf-8"
         extra = "ignore"
 
@@ -38,3 +41,4 @@ settings = Settings()
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
 os.makedirs(os.path.dirname(settings.DATABASE_URL.replace("sqlite:///", "")), exist_ok=True)
+

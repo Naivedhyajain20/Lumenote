@@ -7,6 +7,7 @@ import {
   ShieldAlert, Sliders, Sparkles, UploadCloud, Zap,
   Clock, ExternalLink
 } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 interface ModelMetrics {
   dataset_total_samples: number;
@@ -74,7 +75,6 @@ export default function PredictPage() {
   const [toolWear, setToolWear] = useState<number>(45);
 
   // States
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [metrics, setMetrics] = useState<ModelMetrics | null>(null);

@@ -15,8 +15,7 @@ import {
   RefreshCw, FolderOpen, Eye, Check, Download, Upload
 } from "lucide-react";
 import Link from "next/link";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { API_BASE } from "@/lib/api";
 type ActiveTab = "chat" | "matrix" | "timeline" | "entities" | "board" | "eval";
 
 const WORKSPACE_TABS: { id: ActiveTab; label: string; icon: React.ElementType }[] = [
