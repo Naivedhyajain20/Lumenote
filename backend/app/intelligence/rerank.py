@@ -6,11 +6,16 @@ logger = logging.getLogger("investigator.rerank")
 
 class DocumentReranker:
     def __init__(self):
-        self._init_cross_encoder()
+        self.cross_encoder = None
+        self._model_initialized = False
 
     def _init_cross_encoder(self):
-        self.cross_encoder = None
+        if self._model_initialized:
+            return
+        self._model_initialized = True
         try:
+            import torch
+            torch.set_num_threads(1)
             from sentence_transformers import CrossEncoder
             # Lightweight cross-encoder
             self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L-2-v2")
@@ -21,6 +26,8 @@ class DocumentReranker:
     def score_pairs(self, query: str, chunks: List[Dict[str, Any]]) -> List[float]:
         if not chunks:
             return []
+        if not self._model_initialized:
+            self._init_cross_encoder()
 
         q_words = set(w.lower() for w in query.split() if len(w) > 2)
         raw_scores = []

@@ -20,12 +20,17 @@ class HybridRetriever:
         )
         self.bm25: BM25Okapi = None
         self.indexed_chunks: List[Dict[str, Any]] = []
-        self._init_embedding_model()
+        self.embed_model = None
+        self._model_initialized = False
 
     def _init_embedding_model(self):
-        """Initialize sentence transformers model or fallback embedder."""
-        self.embed_model = None
+        """Initialize sentence transformers model or fallback embedder on demand."""
+        if self._model_initialized:
+            return
+        self._model_initialized = True
         try:
+            import torch
+            torch.set_num_threads(1)
             from sentence_transformers import SentenceTransformer
             # Lightweight, high performance local embedding
             self.embed_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -34,6 +39,8 @@ class HybridRetriever:
             logger.warning(f"Could not load SentenceTransformer: {e}. Using hash-based embeddings fallback.")
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
+        if not self._model_initialized:
+            self._init_embedding_model()
         if self.embed_model:
             try:
                 embeddings = self.embed_model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)

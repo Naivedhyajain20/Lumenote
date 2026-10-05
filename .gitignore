@@ -44,6 +44,9 @@ out/
 ai4i.zip
 data/chroma/
 data/uploads/
+backend/data/
+data/app.db
+backend/app.db
 *.log
 .DS_Store
 Thumbs.db
